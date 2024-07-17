@@ -1,0 +1,185 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Data.gov.sg APIs",
+    "description": "\"APIs for People\"",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.data.gov.sg/v1"
+    }
+  ],
+  "paths": {
+    "/environment/rainfall": {
+      "get": {
+        "summary": "Get rainfall readings across Singapore",
+        "description": "- 5-minute readings from NEA\n- Use the `date_time` parameter to retrieve the latest available data at that moment in time\n- Use the `date` parameter to retrieve all of the readings for that day.\n",
+        "tags": ["Environment"],
+        "parameters": [
+          {
+            "name": "date_time",
+            "in": "query",
+            "description": "YYYY-MM-DD[T]HH:mm:ss (SGT)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rainfall Information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "api_info": {
+                      "$ref": "#/components/schemas/ApiInfo"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "stations": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/StationMetadata"
+                          }
+                        },
+                        "reading_type": {
+                          "$ref": "#/components/schemas/ReadingTypeMetadata"
+                        },
+                        "reading_unit": {
+                          "$ref": "#/components/schemas/ReadingUnitMetadata"
+                        }
+                      }
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "Array of items",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "timestamp": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Timestamp of reading"
+                          },
+                          "readings": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "station_id": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "number"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiInfo": {
+        "type": "object",
+        "description": "Contains information about the API (from Data.gov.sg)",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["healthy"]
+          }
+        }
+      },
+
+      "StationMetadata": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Stations's ID",
+            "type": "string"
+          },
+          "device_id": {
+            "description": "Reading Device's ID (usually same as Station's ID)",
+            "type": "string"
+          },
+          "name": {
+            "description": "Stations's name",
+            "type": "string"
+          },
+          "location": {
+            "description": "Location information for the station",
+            "type": "object",
+            "required": ["longitude", "latitude"],
+            "properties": {
+              "longitude": {
+                "type": "number"
+              },
+              "latitude": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "ReadingTypeMetadata": {
+        "type": "string",
+        "description": "Information about the reading"
+      },
+      "ReadingUnitMetadata": {
+        "type": "string",
+        "description": "Measurement unit for reading"
+      },
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "Error information",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

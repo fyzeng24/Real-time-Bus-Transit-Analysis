@@ -1,0 +1,16 @@
+{
+    "name": "Rainfallcon",
+    "config": {
+      "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+      "database.hostname": "postgres",
+      "database.port": "5432",
+      "database.user": "docker",
+      "database.password": "docker",
+      "database.dbname" : "exampledb",
+      "database.server.name": "postgres",
+      "plugin.name": "pgoutput",
+      "table.include.list": "public.rainfall_streaming"
+   }
+  }   
+
+  // curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 127.0.0.1:8083/connectors/ --data "@debezium.json"
